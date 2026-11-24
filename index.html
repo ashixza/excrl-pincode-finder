@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Excel Pincode Finder</title>
+  <meta name="description" content="Fill missing Indian pincodes in Excel using address and city references.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="top">
+      <div class="brandmark">PIN</div>
+      <div><div class="brand">PINCODE PRO</div><div class="subbrand">EXCEL ADDRESS ENRICHMENT</div></div>
+      <span class="secure">● Local workbook workflow</span>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">INDIA POST LOOKUP • EXCEL AUTOMATION</div>
+      <h1>Every address.<br><span>Its pincode.</span></h1>
+      <p>Upload your workbook. We'll check the address, look up the postal area, and fill missing PIN codes without touching existing values.</p>
+    </section>
+
+    <section class="panel">
+      <div class="section-head"><div><div class="step">01 / UPLOAD</div><h2>Choose your Excel file</h2></div><div class="filetype">.XLSX</div></div>
+      <label class="drop" id="drop">
+        <input type="file" id="file" accept=".xlsx">
+        <div class="upload-icon">↑</div>
+        <strong id="file-title">Drop your workbook here</strong>
+        <span id="file-hint">or click to browse · Maximum 15 MB</span>
+      </label>
+
+      <div class="settings">
+        <div class="step">02 / WORKSHEET & COLUMNS</div>
+        <div class="fields">
+          <label>Worksheet name<input id="sheet" value="Addresses"></label>
+          <label>Address column <small>(optional override)</small><input id="address" placeholder="Auto-detect: Address"></label>
+          <label>Pincode column <small>(optional override)</small><input id="pincode" placeholder="Auto-detect: Pincode"></label>
+          <label>City column <small>(optional override)</small><input id="city" placeholder="Auto-detect: City"></label>
+        </div>
+        <p class="hint">Leave column overrides empty to detect common header names from row 1.</p>
+      </div>
+
+      <div class="policy">
+        <div class="policy-icon">✓</div>
+        <div><strong>Safe-fill mode is on</strong><p>Existing PIN codes are never overwritten. Exact locality match is preferred; city fallback is marked separately. Only the Pincode column in the Addresses sheet is edited.</p></div>
+      </div>
+      <button id="run" disabled>Find & fill pincodes <span>→</span></button>
+      <div id="error" class="error" role="alert"></div>
+    </section>
+
+    <section id="results" class="results hidden">
+      <div class="section-head"><div><div class="step">03 / RESULTS</div><h2>Your workbook is ready</h2></div><span class="ready">● PROCESSED</span></div>
+      <div class="stats">
+        <div class="stat"><span>Exact matches</span><b id="exact">0</b></div>
+        <div class="stat"><span>City fallbacks</span><b id="fallback">0</b></div>
+        <div class="stat"><span>Unresolved</span><b id="unresolved">0</b></div>
+        <div class="stat"><span>Already populated</span><b id="existing">0</b></div>
+      </div>
+      <div class="audit-head"><strong>Processing audit</strong><span id="rowcount"></span></div>
+      <div class="table-wrap"><table><thead><tr><th>ROW</th><th>ADDRESS</th><th>PINCODE</th><th>RESULT</th></tr></thead><tbody id="audit"></tbody></table></div>
+      <p class="disclaimer">City fallback means the postal API returned a city-level post office, not a verified delivery PIN for the exact street address. Review these rows before using them for shipping or compliance.</p>
+      <a id="download" class="download" href="#">↓ Download completed Excel</a>
+    </section>
+    <footer><span>PINCODE PRO</span><span>Address-first · Existing values protected</span></footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
