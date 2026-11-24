@@ -60,6 +60,73 @@ def find_col(headers, override, aliases, required=True):
         raise HTTPException(400, f"Could not identify column. Available headers: {headers}")
     return None
 
+def detect_header_row(ws, address_override=None,
+                      pincode_override=None, city_override=None):
+
+    address_aliases = [
+        "Address", "Full Address", "Address Field",
+        "Customer Address", "Location Address"
+    ]
+
+    pincode_aliases = [
+        "Pincode", "Pin Code", "PIN Code",
+        "Postal Code", "Postcode"
+    ]
+
+    city_aliases = ["City", "Town", "Location", "District"]
+
+    best = None
+
+    for row_num in range(1, min(ws.max_row, 30) + 1):
+        headers = [
+            ws.cell(row_num, col).value
+            for col in range(1, ws.max_column + 1)
+        ]
+
+        normalized = [
+            " ".join(str(h or "").replace("\n", " ").split()).lower()
+            for h in headers
+        ]
+
+        def locate(override, aliases):
+            if override:
+                wanted = " ".join(str(override).split()).lower()
+                return normalized.index(wanted) + 1 if wanted in normalized else None
+
+            for alias in aliases:
+                wanted = " ".join(alias.split()).lower()
+                if wanted in normalized:
+                    return normalized.index(wanted) + 1
+
+            return None
+
+        address_col = locate(address_override, address_aliases)
+        pincode_col = locate(pincode_override, pincode_aliases)
+        city_col = locate(city_override, city_aliases)
+
+        if address_col is None:
+            continue
+
+        score = 10 + (5 if pincode_col else 0) + (2 if city_col else 0)
+
+        if best is None or score > best[0]:
+            best = (score, row_num, address_col, pincode_col, city_col)
+
+    if best is None:
+        raise HTTPException(
+            400,
+            "Could not find an Address header in the first 30 rows."
+        )
+
+    _, header_row, address_col, pincode_col, city_col = best
+
+    if pincode_override and pincode_col is None:
+        raise HTTPException(400, "Specified Pincode column was not found.")
+
+    if city_override and city_col is None:
+        raise HTTPException(400, "Specified City column was not found.")
+
+    return header_row, address_col, pincode_col, city_col
 
 def get_post_offices(query):
     query = str(query or "").strip()
